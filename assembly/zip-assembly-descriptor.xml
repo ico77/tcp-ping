@@ -1,0 +1,36 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+	<id>distribution</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
+		</dependencySet>
+	</dependencySets>
+	<fileSets>
+		<fileSet>
+            <outputDirectory>conf</outputDirectory>
+            <directory>conf</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/</outputDirectory>
+            <directory>scripts/</directory>
+        </fileSet>
+	</fileSets>
+	<files>
+		<file>
+            <outputDirectory>/bin</outputDirectory>
+            <source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
+            <destName>${project.artifactId}.jar</destName>
+        </file>
+		<file>
+			<source>README.md</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+	</files>
+</assembly>
