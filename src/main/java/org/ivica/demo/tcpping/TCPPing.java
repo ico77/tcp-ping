@@ -14,64 +14,58 @@ import org.ivica.demo.tcpping.catcher.Catcher;
 import org.ivica.demo.tcpping.pitcher.Pitcher;
 
 public class TCPPing {
-	
+
 	private static final int DEFAULT_MSG_PER_SECOND = 1;
 	private static final int MIN_MESSAGE_SIZE = 50;
 	private static final int MAX_MESSAGE_SIZE = 3000;
 	private static final int DEFAULT_MESSAGE_SIZE = 300;
 	private static Options options = new Options();
 	private static Logger logger = LogManager.getLogger(TCPPing.class.getName());
-	
+
 	@SuppressWarnings("static-access")
-    private static CommandLine parseCommandLine(String[] args) throws ParseException{
-		
+	private static CommandLine parseCommandLine(String[] args) throws ParseException {
+
 		// add options
 		options.addOption("p", false, "Naèin rada kao Pitcher");
 		options.addOption("c", false, "Naèin rada kao Catcher");
-		
-		Option port = OptionBuilder.withArgName( "port" )
-				        .hasArg()
-				        .withDescription("[Pitcher] TCP socket port koji æe se koristiti za connect\n[Catcher] TCP socket port koji æe se koristiti za listen")
-				        .create( "port" );
+
+		Option port = OptionBuilder.withArgName("port").hasArg()
+		        .withDescription("[Pitcher] TCP socket port koji æe se koristiti za connect\n[Catcher] TCP socket port koji æe se koristiti za listen")
+		        .create("port");
 		options.addOption(port);
-		
-		Option bind = OptionBuilder.withArgName( "ip_address" )
-		        .hasArg()
-		        .withDescription(  "[Catcher] TCP socket bind adresa na kojoj æe biti pokrenut listen" )
-		        .create( "bind" );
+
+		Option bind = OptionBuilder.withArgName("ip_address").hasArg().withDescription("[Catcher] TCP socket bind adresa na kojoj æe biti pokrenut listen")
+		        .create("bind");
 		options.addOption(bind);
-		
-		Option mps = OptionBuilder.withArgName( "rate" )
-		        .hasArg()
-		        .withDescription(  "[Pitcher] brzina slanja izražena u „messages per second“\nDefault: 1" )
-		        .create( "mps" );
+
+		Option mps = OptionBuilder.withArgName("rate").hasArg().withDescription("[Pitcher] brzina slanja izražena u „messages per second“\nDefault: 1")
+		        .create("mps");
 		options.addOption(mps);
-		
-		Option size = OptionBuilder.withArgName( "size" )
-		        .hasArg()
-		        .withDescription(  "[Pitcher] dužina poruke\nMinimum: 50, Maximum: 3000,	Default: 300" )
-		        .create( "size" );
+
+		Option size = OptionBuilder.withArgName("size").hasArg().withDescription("[Pitcher] dužina poruke\nMinimum: 50, Maximum: 3000,	Default: 300")
+		        .create("size");
 		options.addOption(size);
-		
+
 		CommandLineParser parser = new BasicParser();
-		return parser.parse( options, args);
+		return parser.parse(options, args);
 	}
-	
+
 	private static void showUsage() {
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp( "TCPPing", options );
+		formatter.printHelp("TCPPing", options);
 	}
-	
+
 	public static void main(String[] args) {
-		
+
 		try {
 			CommandLine cmd = TCPPing.parseCommandLine(args);
 			if (cmd.hasOption("p") && cmd.hasOption("port")) {
 				String[] unassignedArgs = cmd.getArgs();
-				if (unassignedArgs.length != 1) showUsage();
-				
-				int mps = cmd.hasOption("mps") ? Integer.parseInt(cmd.getOptionValue("mps")) : DEFAULT_MSG_PER_SECOND; 
-				
+				if (unassignedArgs.length != 1)
+					showUsage();
+
+				int mps = cmd.hasOption("mps") ? Integer.parseInt(cmd.getOptionValue("mps")) : DEFAULT_MSG_PER_SECOND;
+
 				int size;
 				if (cmd.hasOption("size")) {
 					size = Integer.parseInt(cmd.getOptionValue("size"));
@@ -81,7 +75,7 @@ public class TCPPing {
 				} else {
 					size = DEFAULT_MESSAGE_SIZE;
 				}
-					
+
 				Pitcher pitcher = new Pitcher(unassignedArgs[0], Integer.parseInt(cmd.getOptionValue("port")), mps, size);
 				pitcher.startPitching();
 			} else if (cmd.hasOption("c") && cmd.hasOption("port") && cmd.hasOption("bind")) {
