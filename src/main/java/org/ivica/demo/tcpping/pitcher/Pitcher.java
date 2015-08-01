@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +35,7 @@ public class Pitcher {
 	private String host;
 
 	private static final long PING_DURATION = 30;
-	private volatile long messageId = 0;
+	private AtomicLong messageId = new AtomicLong();
 	private long maxRtt = -1;
 	private List<PingPacketStatistics> rttStatistics = new LinkedList<PingPacketStatistics>();
 	private static Logger logger = LogManager.getLogger(Pitcher.class.getName());
@@ -59,24 +61,6 @@ public class Pitcher {
 	}
 
 	/**
-	 * Generates a new message id
-	 * 
-	 * @return new message id
-	 */
-	private long getNextMessageId() {
-		return ++messageId;
-	}
-
-	/**
-	 * Get last message id
-	 * 
-	 * @return last message id
-	 */
-	private long getMessageId() {
-		return messageId;
-	}
-
-	/**
 	 * Stores statistics for a single ping packet.
 	 * 
 	 * @param messageId
@@ -97,7 +81,7 @@ public class Pitcher {
 		logger.info("\n********************** {} *****************************", sdf.format(cal.getTime()));
 
 		synchronized (rttStatistics) {
-			logger.info("Total number of messages sent so far: {}", getMessageId());
+			logger.info("Total number of messages sent so far: {}", messageId.get());
 			logger.info("Number of messages received in the previous second: {}", rttStatistics.size());
 
 			if (rttStatistics.size() == 0)
@@ -158,7 +142,7 @@ public class Pitcher {
 				public void run() {
 					// prepare ping packet
 					ByteBuffer message = ByteBuffer.allocate(size);
-					long nextMessageId = getNextMessageId();
+					long nextMessageId = messageId.addAndGet(1);
 					message.putLong(nextMessageId);
 					message.putLong(System.currentTimeMillis());
 					while (message.hasRemaining())
